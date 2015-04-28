@@ -28,39 +28,48 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		//String cityName= args[0];
-		String cityName="potsdam";
-		boolean internet=false;
+		if (args.length>0){
+			String cityName= args[0];
+			//capitalize every type of entry
+			cityName= cityName.substring(0,1).toUpperCase()+cityName.substring(1).toLowerCase();
+		
+		
+			boolean internet=false;
 				
-		//check internet connection
-		if (internetTest("www.google.com") || internetTest("www.amazon.com")){
-			System.out.println("Internet connection ok");
-			internet=true;
+			//check internet connection
+			if (internetTest("www.google.com") || internetTest("www.amazon.com")){
+				System.out.println("Internet connection ok");
+				internet=true;
 
-		}
-		else {
-			System.out.println("Internet connection not available");
-			JOptionPane.showMessageDialog(new JFrame(),  
-					"To run this program you need internet connection. Check your internet connection.",
-					"Connection error",
-					JOptionPane.ERROR_MESSAGE);
+			}
+			else {
+				System.out.println("Internet connection not available");
+				JOptionPane.showMessageDialog(new JFrame(),  
+						"To run this program you need internet connection. Check your internet connection.",
+						"Connection error",
+						JOptionPane.ERROR_MESSAGE);
 
-			internet=false;
-			//close program
-			System.exit(0);
+				internet=false;
+				//close program
+				System.exit(0);
 			}
 		
-		//if internet connection is ok 
-		if (internet){
-			ArrayList<City> cityArray= sendRequest(cityName);
-			if (cityArray.size()>0){
-				if(writeFile(cityName, cityArray)){
-					System.out.println("File successfully created");
-				}
-				else{
-					System.out.println("Unable to create file. Check you have the right permissions");
+			//if internet connection is ok 
+			if (internet){
+				ArrayList<City> cityArray= sendRequest(cityName);
+				if (cityArray.size()>0){
+					if(writeFile(cityName, cityArray)){
+						System.out.println("File successfully created");
+					}
+					else{
+						System.out.println("Unable to create file. Check you have the right permissions");
+					}
+				} else{
+					System.out.println("Sorry, can't find this city");
 				}
 			}
+		} else{
+			System.out.println("Sorry, you must enter the name of the city to search");
 		}
 	}
 	
