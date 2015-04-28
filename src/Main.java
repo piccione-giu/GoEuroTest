@@ -28,6 +28,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		
+		//if there is a input parameter
 		if (args.length>0){
 			String cityName= args[0];
 			//capitalize every type of entry
