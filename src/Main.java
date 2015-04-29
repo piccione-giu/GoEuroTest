@@ -24,9 +24,10 @@ import javax.swing.JOptionPane;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.languagetool.JLanguageTool;
-import org.languagetool.language.BritishEnglish;
-import org.languagetool.rules.RuleMatch;
+
+import com.swabunga.spell.engine.SpellDictionaryHashMap;
+import com.swabunga.spell.event.SpellChecker;
+
 
 
 public class Main {
@@ -38,7 +39,6 @@ public class Main {
 			String cityName= args[0];
 			//capitalize every type of entry
 			cityName= cityName.substring(0,1).toUpperCase()+cityName.substring(1).toLowerCase();
-		
 		
 			boolean internet=false;
 				
@@ -72,9 +72,9 @@ public class Main {
 					}
 				} else{
 					//if there are possible spelling mistake
-					List<String> correction=checkSpelling(cityName);
-					if (correction != null){
-						String choice=makeChoice(correction);
+					List correction=checkSpelling(cityName);
+					if (correction != null){		
+						String choice=makeChoice(correction.get(0).toString());
 						if (choice != null){
 							ArrayList<City> cityArray2= sendRequest(choice);
 							if (cityArray2.size()>0){
@@ -85,11 +85,11 @@ public class Main {
 									System.out.println("Unable to create file. Check you have the right permissions");
 								}
 							} else{
-								System.out.println("4657 Sorry, can't find this city");
+								System.out.println("Sorry, can't find this city");
 							}
 						}
 					} else{
-						System.out.println("123 Sorry, can't find this city");
+						System.out.println("Sorry, can't find this city");
 					}
 				}
 			}
@@ -118,6 +118,7 @@ public class Main {
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.exit(0);
 				return false;
 			}
 		} else{
@@ -142,6 +143,7 @@ public class Main {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.exit(0);
 				return false;
 			}
 		} else{
@@ -170,6 +172,7 @@ public class Main {
 			return true;
 		}
 		catch(IOException io){
+			System.exit(0);
 			return false;
 		}
 		//closing connection
@@ -178,6 +181,7 @@ public class Main {
 				sock.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+				System.exit(0);
 			}
 		}	
 	}
@@ -227,9 +231,11 @@ public class Main {
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.exit(0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.exit(0);
 		}
 				
 		return results;
@@ -239,24 +245,20 @@ public class Main {
 	 * Return the list of possible correction if found, null otherwise
 	 * @ cityName: the word that must be checked
 	 */
-	private static List<String> checkSpelling(String cityName){
-		JLanguageTool langTool = new JLanguageTool(new BritishEnglish());
-		//langTool.activateDefaultPatternRules();  -- only needed for LT 2.8 or earlier
-		List<RuleMatch> matches = null;
+	private static List checkSpelling(String cityName){
+		SpellDictionaryHashMap dictionary = null;
+	    SpellChecker spellChecker = null;
+	    		
 		try {
-			matches= langTool.check(cityName);
-			//matches = langTool.check("A sentence with a error in the Hitchhiker's Guide tot he Galaxy");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+           dictionary = new SpellDictionaryHashMap(new File("english.0"));
+	    }catch (IOException e) {
+			System.exit(0);
+	    	e.printStackTrace();
+	    }
+	     
+		spellChecker = new SpellChecker(dictionary);	 
 		 
-		for (RuleMatch match : matches) {
-			if (match.getShortMessage().equalsIgnoreCase("spelling mistake")){
-				return match.getSuggestedReplacements();
-			}
-		}
-		return null;
+		return spellChecker.getSuggestions(cityName, 0);
 	}
 
 	
@@ -264,22 +266,29 @@ public class Main {
 	 * Return the corrected string if you want to maje another research, null otherwise
 	 * @ correction: the list of possible correction
 	 */
-	private static String makeChoice(List<String> correction){
-		System.out.println("No results were found for the previously city, maybe you were searching "+correction.get(0));
-		System.out.println("if you want to make a new research with \""+correction.get(0)+"\" as keyword digit 1, otherwise 0");
+	private static String makeChoice(String newCity){
+		newCity= newCity.substring(0,1).toUpperCase()+newCity.substring(1).toLowerCase();
+
+		System.out.println("No results were found for the previously city, maybe you were searching "+newCity);
+		System.out.println("if you want to make a new research with \""+newCity+"\" as keyword digit 1, otherwise 0");
 		Scanner keyboard = new Scanner(System.in);
-		int choice = keyboard.nextInt();
+		boolean control=true;
 		String newWord=null;
-		switch (choice){
-		default: 
-			System.out.println("Unvalid choice. Please insert 0 or 1");
-			break;
-		case 1: 
-			newWord=correction.get(0);
-			break;
-		case 0: 
-			newWord=null;
-			break;
+		while (control){
+			int choice = keyboard.nextInt();
+			switch (choice){
+			default: 
+				System.out.println("Unvalid choice. Please insert 0 or 1");
+				break;
+			case 1: 
+				newWord=newCity;
+				control=false;
+				break;
+			case 0: 
+				newWord=null;
+				control=false;
+				break;
+			}
 		}
 		return newWord;
 	}
