@@ -14,7 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -22,12 +24,16 @@ import javax.swing.JOptionPane;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.languagetool.JLanguageTool;
+import org.languagetool.language.BritishEnglish;
+import org.languagetool.rules.RuleMatch;
 
 
 public class Main {
 
 	public static void main(String[] args) {
 		
+		//if there is a input parameter
 		if (args.length>0){
 			String cityName= args[0];
 			//capitalize every type of entry
@@ -65,7 +71,26 @@ public class Main {
 						System.out.println("Unable to create file. Check you have the right permissions");
 					}
 				} else{
-					System.out.println("Sorry, can't find this city");
+					//if there are possible spelling mistake
+					List<String> correction=checkSpelling(cityName);
+					if (correction != null){
+						String choice=makeChoice(correction);
+						if (choice != null){
+							ArrayList<City> cityArray2= sendRequest(choice);
+							if (cityArray2.size()>0){
+								if(writeFile(choice, cityArray2)){
+									System.out.println("File successfully created");
+								}
+								else{
+									System.out.println("Unable to create file. Check you have the right permissions");
+								}
+							} else{
+								System.out.println("4657 Sorry, can't find this city");
+							}
+						}
+					} else{
+						System.out.println("123 Sorry, can't find this city");
+					}
 				}
 			}
 		} else{
@@ -96,7 +121,7 @@ public class Main {
 				return false;
 			}
 		} else{
-			System.out.println("Something goes wrong during file creation. Check yours permissions");
+			System.out.println("Something went wrong during file creation. Check yours permissions");
 			return false;
 		}
 	}
@@ -209,5 +234,53 @@ public class Main {
 				
 		return results;
 	}
+	
+	/*method used to find spelling mistake.
+	 * Return the list of possible correction if found, null otherwise
+	 * @ cityName: the word that must be checked
+	 */
+	private static List<String> checkSpelling(String cityName){
+		JLanguageTool langTool = new JLanguageTool(new BritishEnglish());
+		//langTool.activateDefaultPatternRules();  -- only needed for LT 2.8 or earlier
+		List<RuleMatch> matches = null;
+		try {
+			matches= langTool.check(cityName);
+			//matches = langTool.check("A sentence with a error in the Hitchhiker's Guide tot he Galaxy");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
+		for (RuleMatch match : matches) {
+			if (match.getShortMessage().equalsIgnoreCase("spelling mistake")){
+				return match.getSuggestedReplacements();
+			}
+		}
+		return null;
+	}
 
+	
+	/*method to choice if make another research with the corrected word or terminate.
+	 * Return the corrected string if you want to maje another research, null otherwise
+	 * @ correction: the list of possible correction
+	 */
+	private static String makeChoice(List<String> correction){
+		System.out.println("No results were found for the previously city, maybe you were searching "+correction.get(0));
+		System.out.println("if you want to make a new research with \""+correction.get(0)+"\" as keyword digit 1, otherwise 0");
+		Scanner keyboard = new Scanner(System.in);
+		int choice = keyboard.nextInt();
+		String newWord=null;
+		switch (choice){
+		default: 
+			System.out.println("Unvalid choice. Please insert 0 or 1");
+			break;
+		case 1: 
+			newWord=correction.get(0);
+			break;
+		case 0: 
+			newWord=null;
+			break;
+		}
+		return newWord;
+	}
 }
