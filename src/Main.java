@@ -87,6 +87,8 @@ public class Main {
 							} else{
 								System.out.println("Sorry, can't find this city");
 							}
+						} else {
+							System.out.println("Sorry, can't find this city");
 						}
 					} else{
 						System.out.println("Sorry, can't find this city");
@@ -117,7 +119,7 @@ public class Main {
 				return true;
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("Something went wrong writing the csv file");
 				System.exit(0);
 				return false;
 			}
@@ -142,7 +144,7 @@ public class Main {
 				return true;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("Something went wrong with file management");
 				System.exit(0);
 				return false;
 			}
@@ -172,6 +174,7 @@ public class Main {
 			return true;
 		}
 		catch(IOException io){
+			System.out.println("Unable to connect with the server");
 			System.exit(0);
 			return false;
 		}
@@ -180,7 +183,7 @@ public class Main {
 			try {
 				sock.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Unable to close connection with server");
 				System.exit(0);
 			}
 		}	
@@ -230,11 +233,11 @@ public class Main {
 
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Problem with URL creation");
 			System.exit(0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Problem with server comunication");
 			System.exit(0);
 		}
 				
@@ -252,8 +255,8 @@ public class Main {
 		try {
            dictionary = new SpellDictionaryHashMap(new File("english.0"));
 	    }catch (IOException e) {
+	    	System.out.println("Unable to open dictionary file");
 			System.exit(0);
-	    	e.printStackTrace();
 	    }
 	     
 		spellChecker = new SpellChecker(dictionary);	 
