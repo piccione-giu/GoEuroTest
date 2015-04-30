@@ -68,7 +68,7 @@ public class Main {
 						System.out.println("File successfully created");
 					}
 					else{
-						System.out.println("Unable to create file. Check you have the right permissions");
+						System.out.println("Unable to create file. Make sure you have the right permissions");
 					}
 				} else{
 					//if there are possible spelling mistake
@@ -82,7 +82,7 @@ public class Main {
 									System.out.println("File successfully created");
 								}
 								else{
-									System.out.println("Unable to create file. Check you have the right permissions");
+									System.out.println("Unable to create file. Make sure you have the right permissions");
 								}
 							} else{
 								System.out.println("Sorry, can't find this city");
@@ -96,21 +96,21 @@ public class Main {
 				}
 			}
 		} else{
-			System.out.println("Sorry, you must enter the name of the city to search");
+			System.out.println("Sorry, you must enter a name");
 		}
 	}
 	
 	/*method to write the the arraylist on a file.
-	 * Returns true if everything ok and writes data a file called "@cityName.csv"
-	 * @ cityName: the name of the city we searched. Is also the name of the output file
-	 * @ cityArray: the array of cities we found
+	 * Returns true if everything ok and writes the data on a file called "@cityName.csv"
+	 * @ cityName: the name of the city we searched for. It is also the name of the output file
+	 * @ cityArray: the array of the cities we have found
 	 */
 	private static boolean writeFile(String cityName, ArrayList<City> cityArray) {
-		//check if file exists or can be created
+		//checks if file exists or can be created
 		Path path= Paths.get(cityName+".csv");
 		if (checkFile(path)){
 			try {
-				//write on file
+				//writes to file
 				PrintWriter writer= new PrintWriter(cityName+".csv","UTF-8");
 				for(City c : cityArray){
 					writer.write(c.getId()+","+c.getName()+","+c.getType()+","+c.getLatitude()+","+c.getLongitude()+"\n");
@@ -118,25 +118,24 @@ public class Main {
 				writer.close();
 				return true;
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				System.out.println("Something went wrong writing the csv file");
+				System.out.println("Something went wrong while writing to the csv file");
 				System.exit(0);
 				return false;
 			}
 		} else{
-			System.out.println("Something went wrong during file creation. Check yours permissions");
+			System.out.println("Something went wrong while creating the file. Check your permissions");
 			return false;
 		}
 	}
 	
 	
-	/*method to check if file exists. If exists it will be delete and recreate, otherwise it will be 
+	/*method to check if file exists. If yes then it will be deleted and recreated, otherwise it will be 
 	 * created.
 	 * Returns true if everything goes right
 	 * @ path: the path were the file will be searched and created
 	 */
 	private static boolean checkFile(Path path){
-		//check if file exist
+		//check if file exists
 		if (Files.exists(path)){
 			try {
 				Files.delete(path);
@@ -189,7 +188,7 @@ public class Main {
 		}	
 	}
 	
-	/*this method send the json request and parse the results-
+	/*this method send the request and parse the json results-
 	 * Returns the ArrayList<City> containing the search results
 	 * @ cityName: the name of the city you want to search
 	 */
@@ -223,8 +222,6 @@ public class Main {
 				double latitude= (double)geo.get("latitude");
 				double longitude= (double)geo.get("longitude");
 
-				//System.out.println("id= "+id+"  nome= "+name+"  tipo= "+type+"  latitude= "+latitude+"  longitude= "+longitude);
-				
 				//Adding elements to the results array
 				results.add(new City(id, name, type, latitude, longitude));
 			}
@@ -265,8 +262,8 @@ public class Main {
 	}
 
 	
-	/*method to choice if make another research with the corrected word or terminate.
-	 * Return the corrected string if you want to maje another research, null otherwise
+	/*method to choice if want to make another research with the corrected word or terminate.
+	 * Return the corrected string if you want to make another research, null otherwise
 	 * @ correction: the list of possible correction
 	 */
 	private static String makeChoice(String newCity){
