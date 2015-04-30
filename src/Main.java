@@ -129,10 +129,9 @@ public class Main {
 	}
 	
 	
-	/*method to check if file exists. If yes then it will be deleted and recreated, otherwise it will be 
-	 * created.
+	/*method to check if file exists. If no then a file is created. If yes then the file is deleted and another one is created.
 	 * Returns true if everything goes right
-	 * @ path: the path were the file will be searched and created
+	 * @ path: the path where the file is searched and created
 	 */
 	private static boolean checkFile(Path path){
 		//check if file exists
@@ -269,8 +268,8 @@ public class Main {
 	private static String makeChoice(String newCity){
 		newCity= newCity.substring(0,1).toUpperCase()+newCity.substring(1).toLowerCase();
 
-		System.out.println("No results were found for the previously city, maybe you were searching "+newCity);
-		System.out.println("if you want to make a new research with \""+newCity+"\" as keyword digit 1, otherwise 0");
+		System.out.println("No results were found. Maybe you were searching for "+newCity);
+		System.out.println("if you want to search for \""+newCity+"\" as a keyword digit 1, otherwise 0");
 		Scanner keyboard = new Scanner(System.in);
 		boolean control=true;
 		String newWord=null;
