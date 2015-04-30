@@ -129,7 +129,7 @@ public class Main {
 	}
 	
 	
-	/*method to check if file exists. If no then a file is created. If yes then the file is deleted and another one is created.
+	/*method to check if file exists. If yes then the file is deleted.
 	 * Returns true if everything goes right
 	 * @ path: the path where the file is searched and created
 	 */
@@ -138,7 +138,6 @@ public class Main {
 		if (Files.exists(path)){
 			try {
 				Files.delete(path);
-				File f=new File(path.toString());
 				return true;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -147,7 +146,6 @@ public class Main {
 				return false;
 			}
 		} else{
-			File f=new File(path.toString());
 			return true;
 		}
 	}
